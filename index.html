@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SciBank SHS — Science Resource Databank</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f5f6fa;color:#1a1a1a;min-height:100vh}
+.header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:#185FA5;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px}
+.logo-text{font-size:16px;font-weight:600;color:#1a1a1a}
+.logo-sub{font-size:11px;color:#6b7280}
+.nav{display:flex;gap:4px}
+.nav-btn{padding:7px 16px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:13px;color:#6b7280;display:flex;align-items:center;gap:6px;transition:all 0.15s;font-family:inherit}
+.nav-btn:hover{background:#f3f4f6;color:#1a1a1a}
+.nav-btn.active{background:#EFF6FF;color:#185FA5;font-weight:500}
+.nav-btn i{font-size:16px}
+.main{padding:1.5rem;max-width:1100px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+.section-title{font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.section-sub{font-size:13px;color:#6b7280;margin-bottom:1.5rem}
+.search-bar{position:relative;margin-bottom:1.25rem}
+.search-bar input{width:100%;padding:10px 10px 10px 38px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;font-size:14px;color:#1a1a1a;outline:none;transition:border 0.15s;font-family:inherit}
+.search-bar input:focus{border-color:#185FA5}
+.search-bar i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:17px}
+.filters{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;font-size:12px;color:#6b7280;transition:all 0.15s;display:flex;align-items:center;gap:5px;font-family:inherit}
+.filter-btn:hover{border-color:#185FA5;color:#185FA5}
+.filter-btn.active{background:#185FA5;color:#fff;border-color:#185FA5}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.resource-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:1.1rem 1.25rem;transition:box-shadow 0.15s}
+.resource-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.card-icon.file{background:#EFF6FF;color:#185FA5}
+.card-icon.link{background:#ECFDF5;color:#059669}
+.card-icon.video{background:#FFFBEB;color:#D97706}
+.badge{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:500}
+.badge-11{background:#EFF6FF;color:#185FA5}
+.badge-12{background:#F5F3FF;color:#7C3AED}
+.badge-both{background:#ECFDF5;color:#059669}
+.card-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:6px;line-height:1.4}
+.card-desc{font-size:12px;color:#6b7280;margin-bottom:8px;line-height:1.6}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.pill{font-size:11px;padding:2px 8px;border-radius:8px;background:#f3f4f6;color:#6b7280;display:flex;align-items:center;gap:3px}
+.pill i{font-size:11px}
+.card-meta{font-size:11px;color:#9ca3af;display:flex;align-items:center;gap:5px}
+.card-meta i{font-size:13px}
+.card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid #f3f4f6;flex-wrap:wrap}
+.action-btn{flex:1;padding:7px;border-radius:8px;border:1px solid #e5e7eb;background:transparent;cursor:pointer;font-size:12px;color:#6b7280;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;font-family:inherit;min-width:70px}
+.action-btn:hover{background:#f9fafb;color:#1a1a1a}
+.action-btn.primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.action-btn.primary:hover{background:#0C447C}
+.action-btn.green{background:#059669;color:#fff;border-color:#059669}
+.action-btn.green:hover{background:#047857}
+.action-btn i{font-size:14px}
+.del-btn{padding:6px 9px;border:1px solid #e5e7eb;background:transparent;cursor:pointer;color:#9ca3af;border-radius:8px;display:flex;align-items:center;transition:all 0.15s}
+.del-btn:hover{background:#FEF2F2;color:#DC2626;border-color:#FCA5A5}
+.empty{text-align:center;padding:3.5rem 1rem;color:#9ca3af}
+.empty i{font-size:48px;display:block;margin-bottom:12px;opacity:0.35}
+.empty p{font-size:14px}
+.upload-area{background:#fff;border:2px dashed #d1d5db;border-radius:14px;padding:2.5rem;text-align:center;cursor:pointer;transition:all 0.15s;margin-bottom:1.25rem}
+.upload-area:hover{border-color:#185FA5;background:#f0f7ff}
+.upload-area i{font-size:42px;color:#185FA5;display:block;margin-bottom:10px}
+.upload-area p{font-size:13px;color:#6b7280}
+.file-tag{margin-top:10px;font-size:11px;background:#EFF6FF;color:#185FA5;padding:4px 14px;border-radius:12px;display:inline-block;font-weight:500}
+.form-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:1.4rem;margin-bottom:1rem}
+.form-row{margin-bottom:1rem}
+.form-row label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:5px}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:9px 11px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none;transition:border 0.15s}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#185FA5}
+.form-row textarea{resize:vertical;min-height:70px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.form-row-2 label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:5px}
+.form-row-2 input,.form-row-2 select{width:100%;padding:9px 11px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none;transition:border 0.15s}
+.form-row-2 input:focus,.form-row-2 select:focus{border-color:#185FA5}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1rem}
+.form-row-3 label{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:5px}
+.form-row-3 select{width:100%;padding:9px 11px;border:1px solid #e5e7eb;border-radius:9px;background:#fff;font-size:13px;color:#1a1a1a;font-family:inherit;outline:none;transition:border 0.15s}
+.form-row-3 select:focus{border-color:#185FA5}
+.submit-btn{width:100%;padding:11px;background:#185FA5;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s;font-family:inherit}
+.submit-btn:hover{background:#0C447C}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed}
+.tabs{display:inline-flex;gap:4px;margin-bottom:1.25rem;background:#f3f4f6;padding:4px;border-radius:10px}
+.tab{padding:8px 20px;border-radius:7px;border:none;background:transparent;cursor:pointer;font-size:13px;color:#6b7280;transition:all 0.15s;display:flex;align-items:center;gap:6px;font-family:inherit}
+.tab.active{background:#fff;color:#185FA5;font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab-content{display:none}.tab-content.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:1.75rem}
+.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.1rem;text-align:center}
+.stat-num{font-size:30px;font-weight:700;color:#185FA5}
+.stat-label{font-size:12px;color:#6b7280;margin-top:3px}
+.toast{position:fixed;bottom:24px;right:24px;background:#185FA5;color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:9px;z-index:9999;box-shadow:0 4px 16px rgba(24,95,165,0.3)}
+.toast.show{display:flex}
+.toast i{font-size:17px}
+.subject-header{font-size:14px;font-weight:600;color:#374151;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px}
+.subject-header i{font-size:16px;color:#185FA5}
+.recent-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6}
+.hero{background:linear-gradient(135deg,#185FA5 0%,#0C447C 100%);border-radius:16px;padding:2rem;margin-bottom:1.75rem;color:#fff;display:flex;align-items:center;gap:1.5rem}
+.hero-icon{font-size:56px;opacity:0.85}
+.hero h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.hero p{font-size:13px;opacity:0.85;line-height:1.6}
+/* PREVIEW MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.modal-title{font-size:15px;font-weight:600;color:#1a1a1a;flex:1;margin-right:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid #e5e7eb;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6b7280;flex-shrink:0}
+.modal-close:hover{background:#f3f4f6}
+.modal-body{flex:1;overflow:auto;min-height:400px;display:flex;flex-direction:column}
+.modal-body iframe{flex:1;border:none;width:100%;min-height:500px}
+.modal-note{padding:1.25rem;text-align:center;color:#6b7280;font-size:13px}
+.modal-note i{font-size:32px;display:block;margin-bottom:8px;color:#9ca3af}
+.modal-actions{padding:1rem 1.25rem;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-shrink:0}
+.loading-spinner{display:flex;align-items:center;justify-content:center;padding:3rem;flex:1}
+.loading-spinner i{font-size:32px;color:#185FA5;animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.sync-bar{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:10px 16px;margin-bottom:1.25rem;font-size:13px;color:#065F46;display:flex;align-items:center;gap:8px}
+.sync-bar i{font-size:16px}
+.error-bar{background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:10px 16px;margin-bottom:1.25rem;font-size:13px;color:#991B1B;display:flex;align-items:center;gap:8px;display:none}
+.error-bar i{font-size:16px}
+@media(max-width:600px){
+  .nav-btn span{display:none}
+  .form-row-2,.form-row-3{grid-template-columns:1fr}
+  .hero{flex-direction:column;text-align:center}
+  .logo-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-atom"></i></div>
+    <div>
+      <div class="logo-text">SciBank SHS</div>
+      <div class="logo-sub">Science Resource Databank</div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('library')" id="nav-library"><i class="ti ti-books"></i><span>Library</span></button>
+    <button class="nav-btn" onclick="showPage('upload')" id="nav-upload"><i class="ti ti-upload"></i><span>Upload</span></button>
+    <button class="nav-btn" onclick="showPage('dashboard')" id="nav-dashboard"><i class="ti ti-chart-bar"></i><span>Dashboard</span></button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- LIBRARY PAGE -->
+  <div class="page active" id="page-library">
+    <div class="hero">
+      <div class="hero-icon"><i class="ti ti-flask"></i></div>
+      <div>
+        <h1>SciBank SHS — Science Resource Databank</h1>
+        <p>A shared library of teaching materials for Grade 11 &amp; 12 Science teachers.<br>Upload files, share links, and preview resources — all in one place.</p>
+      </div>
+    </div>
+
+    <div id="sync-bar" class="sync-bar" style="display:none"><i class="ti ti-refresh"></i><span id="sync-msg">Loading resources from Google Sheets...</span></div>
+    <div id="error-bar" class="error-bar"><i class="ti ti-alert-circle"></i><span id="error-msg"></span></div>
+
+    <div class="search-bar">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search-input" placeholder="Search by title, subject, topic, or teacher name..." oninput="renderResources()">
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('Grade 11',this)">Grade 11</button>
+      <button class="filter-btn" onclick="setFilter('Grade 12',this)">Grade 12</button>
+      <button class="filter-btn" onclick="setFilter('Both',this)">Both Grades</button>
+      <button class="filter-btn" onclick="setFilter('file',this)"><i class="ti ti-file"></i> Files</button>
+      <button class="filter-btn" onclick="setFilter('link',this)"><i class="ti ti-link"></i> Links</button>
+    </div>
+    <div class="resource-grid" id="resource-grid">
+      <div class="empty"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i><p>Loading resources...</p></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD PAGE -->
+  <div class="page" id="page-upload">
+    <div class="section-title">Share a Resource</div>
+    <div class="section-sub">Upload a file or add a link for your co-teachers — saved permanently to Google Sheets</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('file-tab',this)"><i class="ti ti-file-upload"></i> Upload File</button>
+      <button class="tab" onclick="switchTab('link-tab',this)"><i class="ti ti-link"></i> Add Link</button>
+    </div>
+
+    <!-- FILE TAB -->
+    <div class="tab-content active" id="file-tab">
+      <div class="form-card">
+        <div class="upload-area" onclick="document.getElementById('file-input').click()">
+          <i class="ti ti-cloud-upload"></i>
+          <p><strong>Click to choose a file</strong> (optional — you can also just paste the Drive link below)</p>
+          <p style="margin-top:4px;font-size:12px">PDF, DOCX, PPTX, XLSX, JPG, PNG, MP4 and more</p>
+          <div class="file-tag" id="file-chosen">No file selected</div>
+        </div>
+        <input type="file" id="file-input" style="display:none" onchange="fileChosen(this)">
+
+        <div class="form-row">
+          <label>Resource title *</label>
+          <input type="text" id="file-title" placeholder="e.g. Earth and Life Science Q1 Module">
+        </div>
+        <div class="form-row">
+          <label>Description</label>
+          <textarea id="file-desc" placeholder="What does this resource cover?"></textarea>
+        </div>
+        <div class="form-row-2">
+          <div>
+            <label>Grade level *</label>
+            <select id="file-grade">
+              <option value="">Select grade</option>
+              <option>Grade 11</option>
+              <option>Grade 12</option>
+              <option>Both</option>
+            </select>
+          </div>
+          <div>
+            <label>Subject * (type it in)</label>
+            <input type="text" id="file-subject" placeholder="e.g. General Biology 1, Physical Science...">
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div>
+            <label>Semester</label>
+            <select id="file-semester">
+              <option value="">Select semester</option>
+              <option>1st Semester</option>
+              <option>2nd Semester</option>
+            </select>
+          </div>
+          <div>
+            <label>Quarter</label>
+            <select id="file-quarter">
+              <option value="">Select quarter</option>
+              <option>Quarter 1</option>
+              <option>Quarter 2</option>
+              <option>Quarter 3</option>
+              <option>Quarter 4</option>
+            </select>
+          </div>
+          <div>
+            <label>Resource type</label>
+            <select id="file-rtype">
+              <option value="">Select type</option>
+              <option>Module / Handout</option>
+              <option>Activity Sheet</option>
+              <option>Lesson Plan</option>
+              <option>Presentation (PPTX)</option>
+              <option>Assessment / Quiz</option>
+              <option>Laboratory Guide</option>
+              <option>Reference Material</option>
+              <option>Video</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Google Drive shareable link * <span style="font-weight:400;color:#6b7280">(upload file to Drive first, then paste link here)</span></label>
+          <input type="url" id="file-driveurl" placeholder="https://drive.google.com/file/d/...">
+        </div>
+        <div class="form-row">
+          <label>Uploaded by</label>
+          <input type="text" id="file-teacher" placeholder="Your name">
+        </div>
+        <button class="submit-btn" onclick="submitFile()" id="file-submit-btn">
+          <i class="ti ti-upload"></i> Share File
+        </button>
+      </div>
+    </div>
+
+    <!-- LINK TAB -->
+    <div class="tab-content" id="link-tab">
+      <div class="form-card">
+        <div class="form-row">
+          <label>Resource title *</label>
+          <input type="text" id="link-title" placeholder="e.g. PhET Simulation — Wave Motion">
+        </div>
+        <div class="form-row">
+          <label>URL / Link *</label>
+          <input type="url" id="link-url" placeholder="https://...">
+        </div>
+        <div class="form-row">
+          <label>Description</label>
+          <textarea id="link-desc" placeholder="What will co-teachers find at this link?"></textarea>
+        </div>
+        <div class="form-row-2">
+          <div>
+            <label>Grade level *</label>
+            <select id="link-grade">
+              <option value="">Select grade</option>
+              <option>Grade 11</option>
+              <option>Grade 12</option>
+              <option>Both</option>
+            </select>
+          </div>
+          <div>
+            <label>Subject * (type it in)</label>
+            <input type="text" id="link-subject" placeholder="e.g. General Biology 1, Physical Science...">
+          </div>
+        </div>
+        <div class="form-row-3">
+          <div>
+            <label>Semester</label>
+            <select id="link-semester">
+              <option value="">Select semester</option>
+              <option>1st Semester</option>
+              <option>2nd Semester</option>
+            </select>
+          </div>
+          <div>
+            <label>Quarter</label>
+            <select id="link-quarter">
+              <option value="">Select quarter</option>
+              <option>Quarter 1</option>
+              <option>Quarter 2</option>
+              <option>Quarter 3</option>
+              <option>Quarter 4</option>
+            </select>
+          </div>
+          <div>
+            <label>Resource type</label>
+            <select id="link-rtype">
+              <option value="">Select type</option>
+              <option>Video Lesson</option>
+              <option>Interactive Simulation</option>
+              <option>Online Module</option>
+              <option>Reference / Article</option>
+              <option>YouTube / Media</option>
+              <option>DepEd Resource</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Shared by</label>
+          <input type="text" id="link-teacher" placeholder="Your name">
+        </div>
+        <button class="submit-btn" onclick="submitLink()" id="link-submit-btn">
+          <i class="ti ti-link"></i> Add Link
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page" id="page-dashboard">
+    <div class="section-title">Dashboard</div>
+    <div class="section-sub">Overview of all resources in the SciBank SHS databank</div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="subject-header"><i class="ti ti-list"></i> Resources by subject</div>
+    <div id="subject-breakdown"></div>
+    <div class="subject-header" style="margin-top:1.75rem"><i class="ti ti-clock"></i> Recently added</div>
+    <div id="recent-list"></div>
+  </div>
+
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Preview</div>
+      <button class="modal-close" onclick="closePreview()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div class="loading-spinner"><i class="ti ti-loader"></i></div>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn primary" id="modal-open-btn" onclick="openModalLink()"><i class="ti ti-external-link"></i> Open in new tab</button>
+      <button class="action-btn" onclick="copyModalLink()"><i class="ti ti-copy"></i> Copy link</button>
+      <button class="action-btn" onclick="closePreview()"><i class="ti ti-x"></i> Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyE78bmB_KbGR6vrQ_arjIALWKDlsOARR-I8VR_KW_RDX3UQb6ay_b-I8OszsNvIsVo0w/exec';
+
+let resources = [];
+let currentFilter = 'all';
+let selectedFile = null;
+let currentPreviewUrl = '';
+
+// ── LOAD FROM GOOGLE SHEETS ──
+async function load() {
+  showSyncBar('Loading resources from Google Sheets...');
+  try {
+    const res = await fetch(API_URL + '?t=' + Date.now());
+    const data = await res.json();
+    resources = data.map(r => ({
+      id: r.id, type: r.type, title: r.title, desc: r.desc,
+      grade: r.grade, subject: r.subject, semester: r.semester,
+      quarter: r.quarter, rtype: r.rtype, teacher: r.teacher,
+      url: r.url, date: r.date
+    }));
+    hideSyncBar();
+  } catch(e) {
+    hideSyncBar();
+    showError('Could not load from Google Sheets. Check your internet connection.');
+    resources = [];
+  }
+  renderResources();
+  renderDashboard();
+}
+
+// ── SAVE TO GOOGLE SHEETS ──
+async function saveToSheets(record) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(record)
+  });
+  return res.json();
+}
+
+async function deleteFromSheets(id) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({action: 'delete', id})
+  });
+  return res.json();
+}
+
+// ── RENDER LIBRARY ──
+function renderResources() {
+  const grid = document.getElementById('resource-grid');
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = resources.filter(r => {
+    const mf = currentFilter==='all' || r.type===currentFilter || r.grade===currentFilter;
+    const ms = !q || [r.title,r.desc,r.teacher,r.subject,r.semester,r.quarter,r.rtype].join(' ').toLowerCase().includes(q);
+    return mf && ms;
+  });
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty"><i class="ti ti-mood-empty"></i><p>No resources found. Try a different filter or add one!</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(r => cardHTML(r)).join('');
+}
+
+function cardHTML(r) {
+  const gc = r.grade==='Grade 11'?'badge-11':r.grade==='Grade 12'?'badge-12':'badge-both';
+  const ic = r.type==='link'?'link':(r.rtype&&r.rtype==='Video')?'video':'file';
+  const ii = r.type==='link'?'ti-link':(r.rtype&&r.rtype.includes('Presentation'))?'ti-presentation':(r.rtype&&r.rtype==='Video')?'ti-video':'ti-file-text';
+  const ds = r.date ? new Date(r.date).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : '';
+  const previewUrl = r.url || '';
+  const safeTitle = (r.title||'').replace(/'/g,"\\'");
+  const safeUrl = (previewUrl||'').replace(/'/g,"\\'");
+  return `<div class="resource-card">
+    <div class="card-top">
+      <div class="card-icon ${ic}"><i class="ti ${ii}"></i></div>
+      <span class="badge ${gc}">${r.grade||''}</span>
+    </div>
+    <div class="card-title">${r.title||''}</div>
+    <div class="pills">
+      ${r.subject?`<span class="pill"><i class="ti ti-microscope"></i>${r.subject}</span>`:''}
+      ${r.semester?`<span class="pill"><i class="ti ti-school"></i>${r.semester}</span>`:''}
+      ${r.quarter?`<span class="pill"><i class="ti ti-calendar"></i>${r.quarter}</span>`:''}
+      ${r.rtype?`<span class="pill"><i class="ti ti-tag"></i>${r.rtype}</span>`:''}
+    </div>
+    <div class="card-desc">${r.desc||''}</div>
+    <div class="card-meta"><i class="ti ti-user-circle"></i>${r.teacher||'Anonymous'}${ds?' &nbsp;·&nbsp; '+ds:''}</div>
+    <div class="card-actions">
+      ${previewUrl?`<button class="action-btn green" onclick="openPreview('${safeTitle}','${safeUrl}')"><i class="ti ti-eye"></i> Preview</button>`:''}
+      <button class="action-btn primary" onclick="window.open('${safeUrl}','_blank')">
+        <i class="ti ${r.type==='link'?'ti-external-link':'ti-download'}"></i> ${r.type==='link'?'Open':'Download'}
+      </button>
+      <button class="action-btn" onclick="copyToClipboard('${safeUrl}')"><i class="ti ti-copy"></i> Copy</button>
+      <button class="del-btn" onclick="deleteResource('${r.id}')" title="Remove"><i class="ti ti-trash" style="font-size:15px"></i></button>
+    </div>
+  </div>`;
+}
+
+// ── PREVIEW MODAL ──
+function openPreview(title, url) {
+  currentPreviewUrl = url;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('preview-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '<div class="loading-spinner"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i></div>';
+
+  setTimeout(() => {
+    let content = '';
+
+    // Google Drive file — convert to embed preview
+    if (url.includes('drive.google.com')) {
+      let embedUrl = url;
+      // Convert /view or /edit links to /preview
+      embedUrl = embedUrl.replace('/view', '/preview').replace('/edit', '/preview');
+      // Handle folder share links
+      if (url.includes('/file/d/')) {
+        const match = url.match(/\/file\/d\/([^/]+)/);
+        if (match) embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+      }
+      content = `<iframe src="${embedUrl}" allowfullscreen style="flex:1;border:none;width:100%;min-height:500px"></iframe>`;
+    }
+    // YouTube
+    else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      let videoId = '';
+      if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
+      else if (url.includes('v=')) videoId = url.split('v=')[1].split('&')[0];
+      if (videoId) {
+        content = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen style="flex:1;border:none;width:100%;min-height:400px"></iframe>`;
+      } else {
+        content = notEmbeddable(url);
+      }
+    }
+    // Google Docs / Slides / Sheets
+    else if (url.includes('docs.google.com')) {
+      let embedUrl = url.replace('/edit', '/preview').replace('/pub', '/preview');
+      if (!embedUrl.includes('/preview')) embedUrl += '/preview';
+      content = `<iframe src="${embedUrl}" allowfullscreen style="flex:1;border:none;width:100%;min-height:500px"></iframe>`;
+    }
+    // PhET, general sites — try iframe
+    else {
+      content = `<iframe src="${url}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups" style="flex:1;border:none;width:100%;min-height:500px" onerror="this.style.display='none'"></iframe>
+      <div class="modal-note" style="padding:0.75rem;font-size:12px;background:#FFFBEB;color:#92400E;border-top:1px solid #FDE68A">
+        <i class="ti ti-info-circle" style="font-size:14px;display:inline;"></i>
+        Some websites may not allow preview due to their security settings. Use "Open in new tab" instead.
+      </div>`;
+    }
+
+    body.innerHTML = content;
+  }, 300);
+}
+
+function notEmbeddable(url) {
+  return `<div class="modal-note">
+    <i class="ti ti-eye-off"></i>
+    <p>This resource cannot be previewed directly.<br>Click <strong>"Open in new tab"</strong> to view it.</p>
+  </div>`;
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('show');
+  document.getElementById('modal-body').innerHTML = '';
+  document.body.style.overflow = '';
+  currentPreviewUrl = '';
+}
+
+function openModalLink() { if(currentPreviewUrl) window.open(currentPreviewUrl,'_blank'); }
+function copyModalLink() { copyToClipboard(currentPreviewUrl); }
+
+// Close modal on overlay click
+document.getElementById('preview-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePreview();
+});
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const total=resources.length;
+  const g11=resources.filter(r=>r.grade==='Grade 11'||r.grade==='Both').length;
+  const g12=resources.filter(r=>r.grade==='Grade 12'||r.grade==='Both').length;
+  const files=resources.filter(r=>r.type==='file').length;
+  const links=resources.filter(r=>r.type==='link').length;
+  const teachers=[...new Set(resources.map(r=>r.teacher).filter(Boolean))].length;
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total resources</div></div>
+    <div class="stat-card"><div class="stat-num">${g11}</div><div class="stat-label">Grade 11</div></div>
+    <div class="stat-card"><div class="stat-num">${g12}</div><div class="stat-label">Grade 12</div></div>
+    <div class="stat-card"><div class="stat-num">${files}</div><div class="stat-label">Files</div></div>
+    <div class="stat-card"><div class="stat-num">${links}</div><div class="stat-label">Links</div></div>
+    <div class="stat-card"><div class="stat-num">${teachers}</div><div class="stat-label">Contributors</div></div>`;
+
+  const subjectCounts = {};
+  resources.forEach(r => { if(r.subject) subjectCounts[r.subject] = (subjectCounts[r.subject]||0)+1; });
+  const breakdown = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
+  const maxCount = breakdown.length ? breakdown[0][1] : 1;
+  document.getElementById('subject-breakdown').innerHTML = breakdown.length
+    ? breakdown.map(([s,count])=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f3f4f6">
+        <div style="flex:1;font-size:13px;color:#374151">${s}</div>
+        <div style="font-size:12px;color:#9ca3af;min-width:70px;text-align:right">${count} resource${count>1?'s':''}</div>
+        <div style="width:90px;height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden">
+          <div style="height:100%;background:#185FA5;width:${Math.round((count/maxCount)*100)}%;border-radius:3px"></div>
+        </div></div>`).join('')
+    : '<p style="font-size:13px;color:#9ca3af">No resources yet.</p>';
+
+  const recent=[...resources].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
+  document.getElementById('recent-list').innerHTML=recent.map(r=>`
+    <div class="recent-row">
+      <div class="card-icon ${r.type==='link'?'link':'file'}" style="width:32px;height:32px;font-size:16px;flex-shrink:0">
+        <i class="ti ${r.type==='link'?'ti-link':'ti-file-text'}"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title||''}</div>
+        <div style="font-size:11px;color:#9ca3af">${r.subject||''} · ${r.grade||''} · ${r.teacher||''}</div>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;flex-shrink:0">${r.date||''}</div>
+    </div>`).join('');
+}
+
+// ── SUBMIT FILE ──
+async function submitFile() {
+  const title = document.getElementById('file-title').value.trim();
+  const grade = document.getElementById('file-grade').value;
+  const subject = document.getElementById('file-subject').value.trim();
+  const driveurl = document.getElementById('file-driveurl').value.trim();
+  if(!title||!grade||!subject||!driveurl){showToast('Please fill in title, grade, subject, and Google Drive link.');return;}
+  const btn = document.getElementById('file-submit-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Saving to Google Sheets...';
+  const record = {
+    id:'r'+Date.now(), type:'file', title,
+    desc: document.getElementById('file-desc').value.trim(),
+    grade, subject,
+    semester: document.getElementById('file-semester').value,
+    quarter: document.getElementById('file-quarter').value,
+    rtype: document.getElementById('file-rtype').value,
+    teacher: document.getElementById('file-teacher').value.trim()||'Anonymous',
+    url: driveurl,
+    date: new Date().toISOString().split('T')[0]
+  };
+  try {
+    await saveToSheets(record);
+    resources.unshift(record);
+    renderResources(); renderDashboard();
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-upload"></i> Share File';
+    ['file-title','file-desc','file-teacher','file-driveurl'].forEach(id=>document.getElementById(id).value='');
+    ['file-grade','file-semester','file-quarter','file-rtype'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('file-subject').value='';
+    document.getElementById('file-chosen').textContent='No file selected';
+    document.getElementById('file-input').value=''; selectedFile=null;
+    showToast('File shared and saved to Google Sheets! ✅');
+  } catch(e) {
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-upload"></i> Share File';
+    showToast('Error saving. Please check your internet connection.');
+  }
+}
+
+// ── SUBMIT LINK ──
+async function submitLink() {
+  const title = document.getElementById('link-title').value.trim();
+  const url = document.getElementById('link-url').value.trim();
+  const grade = document.getElementById('link-grade').value;
+  const subject = document.getElementById('link-subject').value.trim();
+  if(!title||!url||!grade||!subject){showToast('Please fill in title, URL, grade, and subject.');return;}
+  const btn = document.getElementById('link-submit-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Saving to Google Sheets...';
+  const record = {
+    id:'r'+Date.now(), type:'link', title,
+    desc: document.getElementById('link-desc').value.trim(),
+    grade, subject,
+    semester: document.getElementById('link-semester').value,
+    quarter: document.getElementById('link-quarter').value,
+    rtype: document.getElementById('link-rtype').value,
+    teacher: document.getElementById('link-teacher').value.trim()||'Anonymous',
+    url,
+    date: new Date().toISOString().split('T')[0]
+  };
+  try {
+    await saveToSheets(record);
+    resources.unshift(record);
+    renderResources(); renderDashboard();
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-link"></i> Add Link';
+    ['link-title','link-url','link-desc','link-teacher','link-subject'].forEach(id=>document.getElementById(id).value='');
+    ['link-grade','link-semester','link-quarter','link-rtype'].forEach(id=>document.getElementById(id).value='');
+    showToast('Link saved to Google Sheets! ✅');
+  } catch(e) {
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-link"></i> Add Link';
+    showToast('Error saving. Please check your internet connection.');
+  }
+}
+
+// ── DELETE ──
+async function deleteResource(id) {
+  if(!confirm('Remove this resource from the databank?')) return;
+  try {
+    await deleteFromSheets(id);
+    resources = resources.filter(r=>r.id!=id);
+    renderResources(); renderDashboard();
+    showToast('Resource removed.');
+  } catch(e) {
+    showToast('Error deleting. Please try again.');
+  }
+}
+
+// ── HELPERS ──
+function setFilter(f,btn) {
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderResources();
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='dashboard') renderDashboard();
+  if(p==='library') load();
+}
+
+function switchTab(tabId,btn) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function fileChosen(input) {
+  selectedFile=input.files[0];
+  document.getElementById('file-chosen').textContent=selectedFile?selectedFile.name:'No file selected';
+  if(selectedFile&&!document.getElementById('file-title').value)
+    document.getElementById('file-title').value=selectedFile.name.replace(/\.[^.]+$/,'').replace(/[_\-]/g,' ');
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(()=>showToast('Link copied to clipboard!')).catch(()=>showToast('Copy failed. Please copy manually.'));
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function showSyncBar(msg) {
+  const b=document.getElementById('sync-bar');
+  document.getElementById('sync-msg').textContent=msg;
+  b.style.display='flex';
+}
+function hideSyncBar() { document.getElementById('sync-bar').style.display='none'; }
+function showError(msg) {
+  const b=document.getElementById('error-bar');
+  document.getElementById('error-msg').textContent=msg;
+  b.style.display='flex';
+  setTimeout(()=>b.style.display='none',6000);
+}
+
+// ── INIT ──
+load();
+</script>
+</body>
+</html>
